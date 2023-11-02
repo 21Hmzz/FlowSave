@@ -1,0 +1,36 @@
+{
+    "users": [
+        {
+            "id": 1,
+            "name": "John Doe",
+            "email": "johndoe@example.com",
+            "password": "password123"
+        },
+        {
+            "id": 2,
+            "name": "Jane Smith",
+            "email": "janesmith@example.com",
+            "password": "password456"
+        },
+        {
+            "id": 3,
+            "email": "hamza@gmail.com",
+            "password": "hamza",
+            "accounts": []
+        }
+    ],
+    "steps": [
+        {
+            "userID": 1,
+            "stepID": 1
+        },
+        {
+            "userID": 2,
+            "stepID": 1
+        },
+        {
+            "userID": 3,
+            "stepID": 1
+        }
+    ]
+}
