@@ -1,36 +1,53 @@
 {
-    "users": [
-        {
-            "id": 1,
-            "name": "John Doe",
-            "email": "johndoe@example.com",
-            "password": "password123"
-        },
-        {
-            "id": 2,
-            "name": "Jane Smith",
-            "email": "janesmith@example.com",
-            "password": "password456"
-        },
-        {
-            "id": 3,
-            "email": "hamza@gmail.com",
-            "password": "hamza",
-            "accounts": []
-        }
-    ],
-    "steps": [
-        {
-            "userID": 1,
-            "stepID": 1
-        },
-        {
-            "userID": 2,
-            "stepID": 1
-        },
-        {
-            "userID": 3,
-            "stepID": 1
-        }
-    ]
+  "users": [
+    {
+      "id": 1,
+      "name": "John Doe",
+      "email": "johndoe@example.com",
+      "password": "password123"
+    },
+    {
+      "id": 2,
+      "name": "Jane Smith",
+      "email": "janesmith@example.com",
+      "password": "password456"
+    },
+    { "id": 3, "email": "hamza@gmail.com", "password": "hamza", "accounts": [] }
+  ],
+  "steps": [
+    { "userID": 1, "stepID": 1 },
+    { "userID": 2, "stepID": 1 },
+    { "userID": 3, "stepID": 4 }
+  ],
+  "user_accounts": [
+    { "userID": 1, "accountID": 1 },
+    { "userID": 2, "accountID": 2 },
+    { "userID": 3, "accountID": 3 }
+  ],
+  "accounts": [
+    {
+      "id": 1,
+      "name": "Compte pro",
+      "balance": 1000,
+      "currency": "EUR",
+      "salary": 2000,
+      "save": 0
+    },
+    {
+      "id": 2,
+      "name": "Compte perso",
+      "balance": 1000,
+      "currency": "EUR",
+      "salary": 2000,
+      "save": 0
+    },
+    {
+      "id": 3,
+      "name": "Compte perso",
+      "balance": 1000,
+      "currency": "EUR",
+      "salary": 1459,
+      "save": 800
+    }
+  ]
 }

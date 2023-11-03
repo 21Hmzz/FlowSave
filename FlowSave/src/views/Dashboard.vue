@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import Step from '../components/Step.vue';
+import Dashboard from '@/components/Dashboard.vue';
 import Axios from '../tools/Axios';
 
 const router = useRouter();
@@ -44,11 +45,14 @@ getUser(token);
 getSteps(token);
 
 const steps = parseInt(localStorage.getItem('steps') || '0');
-
-
-
-
-
+if (steps <= 3) {
+    showStep.value = true;
+}
+const updateSteps = (step: number) => {
+    localStorage.setItem('steps', step.toString());
+    showStep.value = false;
+    window.location.reload();
+}
 </script>
 
 
@@ -70,7 +74,10 @@ const steps = parseInt(localStorage.getItem('steps') || '0');
         </button>
     </div>
     <div v-if="showStep">
-        <Step :steps="steps" />
+        <Step :steps="steps" @update:steps="updateSteps" />
+    </div>
+    <div v-if="steps === 4">
+        <Dashboard />
     </div>
 </template>
 
