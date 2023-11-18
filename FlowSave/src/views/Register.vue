@@ -68,7 +68,7 @@ function register(name: string, firstname: string, email: string, password: stri
 
 <template>
     <div class="header-home" @click="router.push('/')" style="cursor: pointer;">
-        <img src="../assets/png/logo-no-background.png" alt="Logo de FlowSave" />
+        <img src="../assets/png/flowsave-white-transparent.png" alt="Logo de FlowSave" />
     </div>
     <h2 class="title">
         Inscrivez vous pour commencer à économiser !

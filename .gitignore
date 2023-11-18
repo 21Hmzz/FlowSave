@@ -5,3 +5,4 @@ FlowSave/node_modules
 dist
 .vscode/*
 !.vscode/extensions.json
+node_modules/

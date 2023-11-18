@@ -1,4 +1,5 @@
 import './assets/main.css'
+import './index.css'
 import ToastPlugin from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-bootstrap.css';
 import { createApp } from 'vue'

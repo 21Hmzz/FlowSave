@@ -7,10 +7,10 @@ export class AuthController {
         email: string,
         firstName: string,
         lastName: string,
-    ): string | null {
+    ): object | null {
         return this.authService.register(password, email, firstName, lastName);
     }
-    login(email: string, password: string): string | null {
+    login(email: string, password: string): object | null {
         return this.authService.login(email, password);
     }
 

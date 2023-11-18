@@ -34,10 +34,11 @@ export class UserJSONService implements UserService {
     var infostmp = {
       id: user.id,
       email: user.email,
+      name: user.name,
       balance: account.balance,
       currency: account.currency,
       salary: account.salary,
-      save: account.save,
+      save: account.save
     };
 
     return infostmp;
