@@ -1,0 +1,100 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  firstName      String?
+  lastName      String?
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  forfait   String  @default("free")
+  accounts  Account[]
+  step Int @default(0)
+  customCategories CustomCategory[]
+}
+
+model Account {
+  id        Int      @id @default(autoincrement())
+  name      String
+  type      String
+  balance   Float
+  companyName String? @default("")
+  nameBank String? @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  transactions Transaction[]
+  saves      Save[]
+  @@index([userId],map:"account_balance_index")
+}
+
+model Transaction {
+  id        Int      @id @default(autoincrement())
+  amount    Float
+  type      String
+  name      String @default("Transaction")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  accountId Int
+  comments  String? @default("")
+  account   Account  @relation(fields: [accountId], references: [id])
+  category  Category? @relation(fields: [categoryId], references: [id])
+  categoryId Int?
+  customCategoryId Int?
+  customCategory CustomCategory? @relation(fields: [customCategoryId], references: [id])
+  @@index([accountId])
+
+}
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String
+  type      String
+  color     String @default("#0000FF")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  transactions Transaction[]
+  isCustom Boolean @default(false)
+  maxAmount Float? @default(500)
+}
+
+model CustomCategory {
+  id        Int      @id @default(autoincrement())
+  name      String
+  type      String
+  color     String @default("#0000FF")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  transactions Transaction[]
+  isCustom Boolean @default(true)
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  maxAmount Float? @default(500)
+}
+
+model Save {
+  id        Int      @id @default(autoincrement())
+  amount    Float
+  comment   String @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  accountId Int
+  account   Account  @relation(fields: [accountId], references: [id])
+}
+
+
+
+
+
+

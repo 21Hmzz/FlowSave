@@ -3,5 +3,8 @@
         "front": "cd FlowSave && npm run dev",
         "back": "cd FlowSaveApi && npm run dev",
         "dev": "concurrently \"npm run front\" \"npm run back\""
+    },
+    "dependencies": {
+        "concurrently": "^8.2.2"
     }
 }

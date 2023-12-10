@@ -26,16 +26,29 @@ function login(email: string, password: string) {
         email: email,
         password: password
     }).then((response: any) => {
+      console.log(response);
+      if(response.data.message){
         $toast.open({
-            message: 'Connexion réussie',
-            type: 'success',
+            message: response.data.message,
+            type: 'error',
             dismissible: true,
             pauseOnHover: true,
             duration: 3000
         });
-        localStorage.setItem('token', response.data.token.token);
-        localStorage.setItem('expireTime', response.data.token.expireTime);
+        return;
+      }else {
+        $toast.open({
+          message: 'Connexion réussie',
+          type: 'success',
+          dismissible: true,
+          pauseOnHover: true,
+          duration: 3000
+        });
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('expireTime', response.data.expireTime);
         router.push('/dashboard');
+
+      }
     }).catch((error: any) => {
         $toast.open({
             message: 'Une erreur est survenue',
@@ -98,7 +111,7 @@ function login(email: string, password: string) {
                         </button>
                         <p class="text-sm font-light text-gray-500 dark:text-gray-400">
                             Vous n'avez pas de compte ?
-                            <a href="#" class="font-medium text-primary-600 hover:underline dark:text-primary-500">
+                            <a href="/start" class="font-medium text-primary-600 hover:underline dark:text-primary-500">
                                 S'inscrire
                             </a>
                         </p>

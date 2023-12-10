@@ -37,7 +37,7 @@ function isActive(path: string) {
                             </form>
                         </li>
                         <li>
-                            <a href=""
+                            <a href="/dashboard"
                                 class="flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-gray-100 group dark:text-gray-200 dark:hover:bg-gray-700"
                                 :class="{ 'bg-gray-100 dark:bg-gray-700': isActive('/dashboard') }">
                                 <svg class="w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
@@ -49,7 +49,7 @@ function isActive(path: string) {
                             </a>
                         </li>
                         <li>
-                            <button type="button" :class="{ 'bg-gray-100 dark:bg-gray-700': isActive('/account') }"
+                            <button type="button" :class="{ 'bg-gray-100 dark:bg-gray-700': isActive('/account') || isActive('/account/transactions') || isActive('/account/settings') }"
                                 class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
                                 aria-controls="dropdown-layouts" data-collapse-toggle="dropdown-layouts">
                                 <svg class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
@@ -69,19 +69,27 @@ function isActive(path: string) {
                             </button>
                             <ul id="dropdown-layouts" class="hidden py-2 space-y-2">
                                 <li>
-                                    <a href=""
-                                        class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">Compte
-                                        personnel</a>
-                                </li>
-                                <li>
-                                    <a href=""
-                                        class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">Compte
-                                        professionnel</a>
-                                </li>
-                                <li>
-                                    <a href=""
+                                    <a href="/account"
                                         class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">
-                                        Compte +
+                                      Vue d'ensemble
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/account/transactions"
+                                        class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">
+                                      Transactions
+                                      </a>
+                                </li>
+                              <li>
+                                <a href="/budget"
+                                   class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">
+                                  Budget
+                                </a>
+                              </li>
+                                <li>
+                                    <a href="/account/settings"
+                                        class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">
+                                        Paramètres
                                     </a>
                                 </li>
                             </ul>

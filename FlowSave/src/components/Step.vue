@@ -4,12 +4,13 @@ import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toast-notification';
 
 import Axios from '../tools/Axios';
-defineProps({
+const props = defineProps({
     steps: {
         type: Number,
         required: true
     }
 });
+console.log(props.steps);
 const emit = defineEmits(['update:steps']);
 
 const $toast = useToast();

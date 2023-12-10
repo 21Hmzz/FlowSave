@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
-import { AppsOutline, ArrowForwardSharp, CashOutline, BarChartOutline, LogOutOutline } from '@vicons/ionicons5';
-import { Icon } from '@vicons/utils'
+
 const navbarExpanded = ref(false);
 const toggleNavbar = () => {
     console.log('toggleNavbar');
