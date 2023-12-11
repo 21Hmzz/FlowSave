@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import Navbar from '../components/Navbar.vue';
-import {ref, onMounted, computed, watch} from 'vue';
+import {ref, onMounted, watch} from 'vue';
 import SideBar from "../components/SideBar.vue";
 import Axios from "@/tools/Axios";
 import moment from "moment";
@@ -19,8 +19,7 @@ const defaultCategory = ref([]);
 const customCategory = ref([]);
 const selectedCategory = ref('');
 const selectedCustomCategory = ref('');
-const EditingTransactionId = ref('');
-const DeleteTransactionId = ref('');
+
 
 const newTransaction = ref({
   name: '',
@@ -463,7 +462,7 @@ function limitToOneCategory() {
                 </nav>
                 <div>
                   <select
-                      class="block w-1/4 mt-4 mb-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      class="block w-1/4 mt-4 mb-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:focus:ring-gray-700 dark:focus:border-gray-600 dark:text-white"
                       aria-label="Default select example" v-model="selectedAccount" @change="changeAccount">
 
                     <option :selected="selectedAccount === ''" value="">
@@ -487,13 +486,13 @@ function limitToOneCategory() {
                       Recherche
                     </label>
                     <div class="relative mt-1 lg:w-64 xl:w-96">
-                      <input type="text" name="libelle" id="users-search"
+                      <input type="search" name="libelle" id="users-search"
                              class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                              placeholder="Rechercher..." autocomplete="off" v-model="search"
                              @keyup="searchTransaction()">
                     </div>
                     <select
-                        class="block w-1/4 mt-4 mb-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        class="block w-1/4 mt-4 mb-2 text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:focus:ring-gray-700 dark:focus:border-gray-600 dark:text-white"
                         aria-label="Default select example" v-model="selectedCategory" @change="changeCategory">
 
                       <option :selected="selectedCategory === ''" value="">
@@ -505,7 +504,7 @@ function limitToOneCategory() {
                     </select>
 
                     <select
-                        class="block w-1/4 mt-4 mb-2 text-gray-700 bg-white  rounded-md shadow-sm focus:outline-none focus:ring-indigo-500  sm:text-sm"
+                        class="block w-1/4 mt-4 mb-2 text-gray-700 bg-white  rounded-md shadow-sm focus:outline-none focus:ring-indigo-500  sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:focus:ring-gray-700 dark:focus:border-gray-600 dark:text-white"
                         aria-label="Default select example" v-model="selectedCustomCategory"
                         @change="changeCustomCategory">
 
@@ -1048,38 +1047,3 @@ function limitToOneCategory() {
     </div>
   </div>
 </template>
-<style>
-.transaction {
-  background-color: var(--mixed-300);
-  border-radius: 10px;
-  width: 95%;
-
-}
-
-.positive {
-  background-color: var(--green-500);
-  color: white;
-  padding: 4px 8px;
-  text-align: center;
-  border-radius: 5px;
-  width: 90%;
-  margin: 0 auto;
-  font-weight: bold;
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-}
-
-
-.negative {
-  background-color: var(--red-500);
-  color: white;
-  padding: 4px 8px;
-  text-align: center;
-  border-radius: 5px;
-  width: 90%;
-  margin: 0 auto;
-  font-weight: bold;
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-}
-</style>

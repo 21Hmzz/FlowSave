@@ -6,8 +6,10 @@ import User from "@/tools/User";
 import SideBar from "@/components/SideBar.vue";
 import Navbar from "@/components/Navbar.vue";
 import moment from "moment";
+import {useToast} from "vue-toast-notification";
 
 const route = useRoute();
+const $toast = useToast();
 const IdTransaction: number = parseInt(route.params.id.toString());
 const token = localStorage.getItem('token') || '';
 const user = new User(token);
@@ -17,9 +19,18 @@ const transactionCategory = ref<any>({});
 onMounted(async () => {
   userInfos.value = await user.getInfos();
   transaction.value = await user.getTransaction(IdTransaction);
-  transactionCategory.value = await user.getCategory(transaction.value.categoryId, transaction.value.categoryId ? false : true);
-  console.log(transactionCategory.value);
+  transactionCategory.value = user.getCategory(transaction.value.categoryId, !transaction.value.categoryId);
 });
+
+const saveTransaction = async () => {
+  await user.updateTransaction(transaction.value);
+  $toast.open({
+    message: 'Transaction enregistrée',
+    type: 'success',
+    position: 'top-right',
+    duration: 5000,
+  });
+}
 
 </script>
 
@@ -76,7 +87,8 @@ onMounted(async () => {
 
               <div class="px-5 pb-5 mt-4">
                 <h3 class="text-sm font-semibold tracking-tight text-gray-900 dark:text-white first-letter:uppercase">
-                  Ajoutez des notes, des photos, des pièces jointes, des tags, des personnes et plus encore à cette transaction.
+                  Ajoutez des notes, des photos, des pièces jointes, des tags, des personnes et plus encore à cette
+                  transaction.
                 </h3>
                 <div class="flex flex-col items-center w-full mt-2.5 mb-5 ">
 
@@ -136,7 +148,7 @@ onMounted(async () => {
                     </label>
                     <input type="file" name="category" id="category" autocomplete="given-name"
                            class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                          >
+                    >
                   </div>
                 </div>
               </div>
@@ -144,14 +156,16 @@ onMounted(async () => {
 
 
           </div>
-         <div class="flex justify-center mt-5 mr-5 gap-2">
-           <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-             Enregistrer
-           </button>
-           <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-             Supprimer
+          <div class="flex justify-center mt-5 mr-5 gap-2">
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                    @click="saveTransaction"
+            >
+              Enregistrer
             </button>
-         </div>
+            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+              Supprimer
+            </button>
+          </div>
         </div>
       </Suspense>
     </div>

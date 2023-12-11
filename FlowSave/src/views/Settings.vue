@@ -2,82 +2,78 @@
 import Navbar from '../components/Navbar.vue';
 import SideBar from "@/components/SideBar.vue";
 import {onMounted, ref, watch} from "vue";
-import Axios from "@/tools/Axios";
 import {useToast} from "vue-toast-notification";
+import User from "@/tools/User";
+
 interface Account {
   name: string,
   type: string,
   companyName: string,
   nameBank: string,
 }
-const infos = ref<any>({});
-const $toast = useToast();
-const data = ref([]);
-const account = ref<Account>({name: '', type: '', companyName: '', nameBank: ''});
 
-const unsavedAlert = ref(false);
-const selectedAccount = ref(localStorage.getItem('selectedAccountType') || 'personnel');
-const editedAccount = ref({
+const $toast = useToast();
+const token = <string>localStorage.getItem('token');
+const user = new User(token || '');
+const account = ref<Account>({
   name: '',
   type: '',
   companyName: '',
   nameBank: '',
 });
+const tmpAccount = ref<Account>({
+  name: '',
+  type: '',
+  companyName: '',
+  nameBank: '',
+});
+const unsavedAlert = ref(false);
+const selectedAccount = ref(localStorage.getItem('selectedAccount') || '');
 const newCategory = ref('');
 
-const getAllInfosDashboard = async (token: string, verify = false) => {
-  if (token) {
-    try {
-      const response = await Axios.get('/user/dashboard', {
-        headers: {
-          Authorization: `${token}`
-        }
-      });
-      if (!verify) {
-        infos.value = response.data.info;
-      }
-      return response.data.info;
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
-  } else {
-    return null;
-  }
-};
 onMounted(async () => {
-  const token = localStorage.getItem('token') || '';
-  if (token) {
-    const tmpData = await getAllInfosDashboard(token);
-    if (tmpData && tmpData.accounts) {
-      data.value = tmpData.accounts;
-      account.value = data.value.find((account: any) => account.type === selectedAccount.value) || { name: '', type: '', companyName: '', nameBank: '' };
-    }
-  }
-  watch(infos.value, async () => {
-    const databaseInfos = await getAllInfosDashboard(token, true);
-    if (databaseInfos != infos.value) {
-      unsavedAlert.value = true;
-    }
+  await user.getInfos();
 
-  })
-});
+  if (selectedAccount.value !== '') {
+    //@ts-ignore
+    account.value = user.infos.accounts.find((account: any) => account.id === parseInt(selectedAccount.value));
+    tmpAccount.value = { ...account.value };
+  }
+  console.log(tmpAccount.value);
+  watch(account.value, (newValue) => {
+    console.log(newValue);
+    if (
+        newValue.name !== tmpAccount.value.name ||
+        newValue.type !== tmpAccount.value.type ||
+        newValue.companyName !== tmpAccount.value.companyName ||
+        newValue.nameBank !== tmpAccount.value.nameBank
+    ) {
+      unsavedAlert.value = true;
+      console.log('changed');
+    }
+  });
+})
+
 
 function changeAccount() {
-  localStorage.setItem('selectedAccountType', selectedAccount.value);
-  account.value = data.value.find((account: any) => account.type === selectedAccount.value) || { name: '', type: '', companyName: '', nameBank: '' };
+  if (selectedAccount.value !== '') {
+    //@ts-ignore
+    account.value = user.infos.accounts.find((account: any) => account.id === parseInt(selectedAccount.value));
+  }
 }
 
 function addCategory() {
-  if (infos.value.forfait != 'free') {
+  if (user.infos.forfait !== 'free') {
     if (newCategory.value !== '') {
-      infos.value.customCategories.push({name: newCategory.value, type: 'expense'});
+      //@ts-ignore
+      user.infos.customCategories.push({name: newCategory.value, type: 'expense'});
       newCategory.value = '';
     }
   } else {
-    if (infos.value.customCategories.length < 10) {
+    if (user.infos.customCategories.length < 10) {
       if (newCategory.value !== '') {
-        infos.value.customCategories.push({name: newCategory.value, type: 'expense'});
+        //@ts-ignore
+        user.infos.customCategories.push({name: newCategory.value, type: 'expense'});
         newCategory.value = '';
       }
     } else {
@@ -89,34 +85,25 @@ function addCategory() {
   }
 }
 
+
 function saveAccount() {
-  console.log(infos.value);
-  unsavedAlert.value = false;
-  const token = localStorage.getItem('token') || '';
-  if (token) {
-    Axios.put('/user/edit', {
-      user: infos.value
-    }, {
-      headers: {
-        Authorization: `${token}`
-      }
-    }).then(() => {
-      $toast.open({
-        message: 'Compte enregistré',
-        type: 'success'
-      });
-    }).catch((error) => {
-          console.error(error);
-        }
-    )
-  }
+  user.save();
+}
+function deleteAccount() {
+  //@ts-ignore
+  user.infos.accounts.splice(user.infos.accounts.indexOf(account.value), 1);
+  user.save();
+  //@ts-ignore
+  localStorage.setItem('selectedAccount',user.infos.accounts[0].id);
+  window.location.reload();
 }
 </script>
 
 
 <template>
+
   <div class="row overflow-hidden h-screen">
-    <Navbar :infos="infos"/>
+    <Navbar :infos="user.infos"/>
     <div class="flex pt-16 overflow-hidden bg-gray-50 dark:bg-gray-900">
       <SideBar/>
       <suspense>
@@ -135,7 +122,7 @@ function saveAccount() {
                   <option :selected="selectedAccount === ''" value="">
                     Choix du compte
                   </option>
-                  <option v-for="account in infos.accounts" :key="account.id" :value="account.type">
+                  <option v-for="account in user.infos.accounts" :key="account.id" :value="account.id">
                     {{ account.name }}
                   </option>
 
@@ -144,30 +131,19 @@ function saveAccount() {
             </div>
             <div class="flex items-center">
               <button
+                  class="flex mx-3 items-center justify-between px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-red-600 border border-transparent rounded-lg active:bg-red-600 hover:bg-red-700 focus:outline-none focus:shadow-outline-blue"
+                  aria-label="Delete"
+                  @click="deleteAccount"
+              >
+                <span>Supprimer</span>
+              </button>
+              <button
                   class="flex items-center justify-between px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-lg active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue"
                   aria-label="Edit"
                   @click="saveAccount"
               >
                 <span>Enregistrer</span>
-                <svg
-                    class="w-4 h-4 ml-2 -mr-1"
-                    fill="currentColor"
-                    aria-hidden="true"
-                    viewBox="0 0 20 20"
-                >
-                  <path
-                      fill-rule="evenodd"
-                      d="M5.293 14.707a1 1 0 010-1.414L10.586 8.7l1.414 1.414L6.707 15.12a1 1 0 01-1.414 0z"
-                      clip-rule="evenodd"
-                  ></path>
-                  <path>
-                  </path>
-                  <path
-                      fill-rule="evenodd"
-                      d="M13 4a1 1 0 011 1v7a1 1 0 11-2 0V5a1 1 0 011-1z"
-                      clip-rule="evenodd"
-                  ></path>
-                </svg>
+
               </button>
             </div>
           </div>
@@ -249,7 +225,7 @@ function saveAccount() {
                 <h3 class="text-lg  font-medium text-gray-900 dark:text-gray-200">
                   Mes catégories de dépenses
                 </h3>
-                <div class="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2" v-for="category in infos.customCategories">
+                <div class="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2" v-for="category in user.infos.customCategories">
                   <div class="col-span-2 flex justify-between items-center">
                   <span class="text-gray-700 dark:text-gray-200 font-medium">
                     {{ category.name }}
@@ -260,7 +236,7 @@ function saveAccount() {
                       <button
                           class="flex items-center justify-between px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-red-600 border border-transparent rounded-lg active:bg-red-600 hover:bg-red-700 focus:outline-none focus:shadow-outline-blue"
                           aria-label="Delete"
-                          @click="infos.customCategories.splice(infos.customCategories.indexOf(category), 1)"
+                          @click="user.infos.customCategories.splice(user.infos.customCategories.indexOf(category), 1)"
                       >
                         <span>Supprimer</span>
                       </button>

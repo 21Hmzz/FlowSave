@@ -3,7 +3,6 @@ import {ref, onMounted} from 'vue';
 import {useRouter} from 'vue-router';
 import Step from '../components/Step.vue';
 import Dashboard from '@/components/Dashboard.vue';
-import Axios from '../tools/Axios';
 import User from "@/tools/User";
 
 
@@ -15,24 +14,25 @@ const user = new User(token);
 onMounted(async () => {
   const user = new User(token);
   const userInfos = await user.getInfos();
-  console.log(userInfos);
-  if (userInfos.step === 4) {
+  localStorage.setItem('steps', userInfos.step.toString());
+  if (userInfos.step === 5) {
     router.push('/dashboard');
   } else {
     showStep.value = userInfos.step !== 0;
     localStorage.setItem('steps', userInfos.step.toString());
+    window.location.reload();
   }
 
 });
 
 const steps = parseInt(localStorage.getItem('steps') || '0');
-if (steps <= 3) {
+if (steps <= 4) {
   showStep.value = true;
 }
 const updateSteps = (step: number) => {
   user.infos.step = step;
   localStorage.setItem('steps', step.toString());
-  if(step === 4) {
+  if(step === 5) {
    showStep.value = false;
   }
   user.save();
@@ -62,7 +62,7 @@ const updateSteps = (step: number) => {
   <div v-if="showStep">
     <Step :steps="steps" @update:steps="updateSteps"/>
   </div>
-  <div v-if="steps === 4">
+  <div v-if="steps === 5">
     <Dashboard/>
   </div>
 </template>

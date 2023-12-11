@@ -68,7 +68,7 @@ const getAllInfosDashboard = async (token: string) => {
   }
 };
 
-const selectedAccount = ref(localStorage.getItem('selectedAccountType') || 'personnel');
+const selectedAccount = ref(localStorage.getItem('selectedAccount') || '');
 const totalTransactionsPositive = ref(0);
 const totalTransactionsNegative = ref(0);
 const totalTransactionsPositiveLastMonth = ref(0);
@@ -85,7 +85,7 @@ const account = ref<Account>({
 });
 
 function refreshChartData(selectedAccount: any) {
-  localStorage.setItem('selectedAccountType', selectedAccount);
+  localStorage.setItem('selectedAccount', selectedAccount);
   window.location.reload();
 }
 
@@ -99,14 +99,15 @@ onMounted(async () => {
   if (tmpData && tmpData.accounts) {
     data.value = tmpData;
     accounts.value = tmpData.accounts;
-    const selectedAccountType = selectedAccount.value;
-    account.value = accounts.value.find((account: any) => account.type === selectedAccountType) || {
+    const selectedAccountId = parseInt(selectedAccount.value);
+    account.value = accounts.value.find((account: any) => account.id === selectedAccountId) || {
       id: 0,
       name: '',
       type: '',
       transactions: [],
       saves: []
     };
+
     transactions.value = account.value.transactions || {id: 0, name: '', amount: 0, date: '', type: '', comments: ''}
     transactions.value.forEach((transaction: any) => {
       let date = moment(transaction.date).format('M');
@@ -137,9 +138,9 @@ onMounted(async () => {
       totalSavingsAll.value += save.amount;
     });
     const total = entreeTab + sortieTab + epargneTab;
-    entreeTab = Math.round((entreeTab / total) * 100);
-    sortieTab = Math.round((sortieTab / total) * 100);
-    epargneTab = Math.round((epargneTab / total) * 100);
+    entreeTab = Math.round((entreeTab / total) * 100) || 0;
+    sortieTab = Math.round((sortieTab / total) * 100) || 0;
+    epargneTab = Math.round((epargneTab / total) * 100) || 0;
     $toast.open({
       message: 'Données chargées',
       type: 'success',
@@ -239,7 +240,9 @@ onMounted(async () => {
   }
   if (document.getElementById('traffic-by-device')) {
     const chart = new ApexCharts(document.getElementById('traffic-by-device'), getTrafficChannelsChartOptions());
-    chart.render();
+    if (transactions.value.length > 0) {
+      chart.render();
+    }
 
     // init again when toggling dark mode
     document.addEventListener('dark-mode', function () {
@@ -254,7 +257,7 @@ function addSave(isDelete: boolean = false) {
       id: 0,
       amount: parseFloat(newSave.value.amount),
       comment: newSave.value.comment,
-      createdAt: newSave.value.date
+      createdAt: new Date(newSave.value.date).toISOString()
     });
   }
 
@@ -266,7 +269,7 @@ function addSave(isDelete: boolean = false) {
     }
   }).then((response) => {
     if (response.status === 200) {
-      if(isDelete) {
+      if (isDelete) {
         $toast.open({
           message: 'Economie supprimée',
           type: 'success',
@@ -299,10 +302,10 @@ function addSave(isDelete: boolean = false) {
 
 <template>
   <Navbar :infos="infos"/>
-  <div class="flex pt-16  bg-gray-50 dark:bg-gray-900">
+  <div class="flex pt-16 overflow-x-hidden bg-gray-50 dark:bg-gray-900">
     <SideBar/>
     <Suspense fallback="Loading...">
-      <div class="p-4 lg:ml-64 w-screen h-screen">
+      <div class="p-4 lg:ml-64 w-screen ">
 
         <div
             class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
@@ -317,7 +320,7 @@ function addSave(isDelete: boolean = false) {
             </div>
             <select v-model="selectedAccount" @change="refreshChartData(selectedAccount)"
                     class=" h-10 px-3 text-base text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm appearance-none focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white dark:border-gray-700">
-              <option v-for="account in accounts" :key="account.id" :value="account.type">
+              <option v-for="account in accounts" :key="account.id" :value="account.id">
                 {{ account.name }}
               </option>
             </select>
@@ -342,7 +345,10 @@ function addSave(isDelete: boolean = false) {
                 }}</span>
             </div>
           </div>
-          <div id="traffic-by-device"></div>
+
+          <div id="traffic-by-device">
+          </div>
+
           {{ transactions.length === 0 ? 'Aucune transaction' : '' }}
           <!-- Card Footer -->
           <div class="flex items-center justify-between pt-4 lg:justify-evenly sm:pt-6">
@@ -465,17 +471,25 @@ function addSave(isDelete: boolean = false) {
           </div>
         </div>
         <div
-            class="p-4 mt-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800">
+            class="p-4 mb-4 mt-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800 mb-2">
           <div
               class="flex items-center justify-between pb-4 mb-4 border-b border-gray-200 dark:border-gray-700">
             <h3 class="text-2xl font-bold leading-none text-gray-900 sm:text-3xl dark:text-white">
               Mes économies
             </h3>
 
-            <div>
+            <div
+                class="flex items-center justify-between pb-4 mb-4 border-b border-gray-200 dark:border-gray-700 text-dark dark:text-white">
               Total :
               {{
                 Intl.NumberFormat('fr-FR', {style: 'currency', currency: 'EUR'}).format(totalSavingsAll)
+              }}
+            </div>
+            <div
+                class="flex items-center justify-between pb-4 mb-4 border-b border-gray-200 dark:border-gray-700 text-dark dark:text-white">
+              Objectif mensuel :
+              {{
+                Intl.NumberFormat('fr-FR', {style: 'currency', currency: 'EUR'}).format(infos.save)
               }}
             </div>
             <div>
@@ -608,6 +622,7 @@ function addSave(isDelete: boolean = false) {
             </tbody>
           </table>
         </div>
+
 
 
       </div>

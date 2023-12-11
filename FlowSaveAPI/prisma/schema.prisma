@@ -21,6 +21,8 @@ model User {
   forfait   String  @default("free")
   accounts  Account[]
   step Int @default(0)
+  salaire Float? @default(0)
+  save Float? @default(0)
   customCategories CustomCategory[]
 }
 

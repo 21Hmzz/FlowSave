@@ -7,7 +7,9 @@ import Account from '../views/Account.vue'
 import Transactions from "@/views/Transactions.vue";
 import Transaction from "@/views/Transaction.vue";
 import Settings from "@/views/Settings.vue";
+import UserSettings from "@/views/UserSettings.vue";
 import Budget from "@/views/Budget.vue";
+import AddAccount from "@/components/AddAccount.vue";
 import {useToast} from 'vue-toast-notification'
 import User from "@/tools/User";
 
@@ -47,56 +49,106 @@ const router = createRouter({
             path: '/login',
             name: 'login',
             component: Login,
+            beforeEnter: (to, from, next) => {
+                if (user.verifyToken()) {
+                    toast.info('Vous êtes déjà connecté');
+                    return next({ name: 'dashboard' });
+                }
+                return next();
+            }
         },
         {
             path: '/dashboard',
             name: 'dashboard',
             component: Dashboard,
-            beforeEnter: authMiddleWare
+            beforeEnter : function (to, from, next) {
+                authMiddleWare(to, from, next);
+                document.title = 'FlowSave - Dashboard';
+            }
+
         },
         {
             path: '/account',
             name: 'account',
             component: Account,
-            beforeEnter: authMiddleWare
+            beforeEnter: function (to, from, next) {
+                authMiddleWare(to, from, next);
+                document.title = 'FlowSave - Comptes';
+            }
         },
         {
             path: '/account/transactions',
             component: Transactions,
-            beforeEnter: authMiddleWare
+            beforeEnter: function (to, from, next) {
+                authMiddleWare(to, from, next);
+                document.title = 'FlowSave - Transactions';
+            }
         },
         {
             path: '/account/settings',
             component: Settings,
-            beforeEnter: authMiddleWare
+            beforeEnter: function (to, from, next) {
+                authMiddleWare(to, from, next);
+                document.title = 'FlowSave - Paramètres';
+            }
         },
         {
             path: '/account/:id',
             name: 'account-id',
             component: Account,
-            beforeEnter: authMiddleWare
+            beforeEnter: function (to, from, next) {
+                authMiddleWare(to, from, next);
+                document.title = 'FlowSave - Compte';
+            }
         },
         {
             path: '/budget/:id/:isCustom',
             name: 'budget-id',
             component: Budget,
             props: true,
-            beforeEnter: authMiddleWare
+            beforeEnter: function (to, from, next) {
+                authMiddleWare(to, from, next);
+                document.title = 'FlowSave - Budget';
+            }
         },
         {
             path: '/budget',
             name: 'budget',
             component: Budget,
             props: true,
-            beforeEnter: authMiddleWare
+            beforeEnter: function (to, from, next) {
+                authMiddleWare(to, from, next);
+                document.title = 'FlowSave - Budget';
+            }
 
+        },
+        {
+            path: '/add-account',
+            name: 'add-account',
+            component: AddAccount,
+            beforeEnter: function (to, from, next) {
+                authMiddleWare(to, from, next);
+                document.title = 'FlowSave - Ajouter un compte';
+            }
         },
         {
             path: '/transaction/:id',
             name: 'transaction-id',
             component: Transaction,
             props: true,
-            beforeEnter: authMiddleWare
+            beforeEnter: function (to, from, next) {
+                authMiddleWare(to, from, next);
+                document.title = 'FlowSave - Transaction';
+            }
+        },
+        {
+            path:'/settings/security',
+            name: 'security',
+            component: UserSettings,
+            beforeEnter: function (to, from, next) {
+                authMiddleWare(to, from, next);
+                document.title = 'FlowSave - Sécurité';
+            }
         },
         {
             path: '/logout',

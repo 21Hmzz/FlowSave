@@ -11,9 +11,12 @@
   },
   "dependencies": {
     "@tailwindcss/forms": "^0.5.6",
+    "@types/crypto-js": "^4.2.1",
     "apexcharts": "^3.44.0",
     "axios": "^1.6.0",
+    "bcrypt": "^5.1.1",
     "chart.js": "^4.4.0",
+    "crypto-js": "^4.2.0",
     "flowbite": "^2.0.0",
     "flowbite-vue": "^0.1.0",
     "moment": "^2.29.4",
@@ -26,7 +29,7 @@
   "devDependencies": {
     "@tsconfig/node18": "^18.2.2",
     "@types/axios": "^0.14.0",
-    "@types/node": "^18.18.5",
+    "@types/node": "^18.19.3",
     "@vicons/carbon": "^0.12.0",
     "@vicons/fluent": "^0.12.0",
     "@vicons/ionicons5": "^0.12.0",

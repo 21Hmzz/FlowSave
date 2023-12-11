@@ -1,4 +1,6 @@
 import Axios from "@/tools/Axios";
+import CryptoJS from 'crypto-js';
+
 type Category = {
     id: number,
     name: string,
@@ -25,6 +27,7 @@ type Account = {
     updatedAt: Date,
     transactions: any[],
     userId: number,
+    saves: any[],
 }
 type Transaction = {
     id: number,
@@ -48,6 +51,9 @@ type userInfos = {
     email: string,
     password: string,
     step: number,
+    salaire: number,
+    forfait: string,
+    save: number,
     createdAt: Date,
     updatedAt: Date,
     accounts: Account[],
@@ -60,6 +66,7 @@ type userInfos = {
     customCategoryId: number,
     type: string,
 }
+
 class User {
 
     public infos: userInfos = {} as userInfos;
@@ -69,9 +76,9 @@ class User {
         token: string
     ) {
         this.token = token;
-        if(this.verifyToken()){
+        if (this.verifyToken()) {
             this.getInfos();
-        }else{
+        } else {
             localStorage.removeItem('token');
         }
     }
@@ -105,6 +112,23 @@ class User {
         return true;
     }
 
+    public async changePassword(newPassword: string) {
+        const api = await Axios.put('/user/password', {
+            password: CryptoJS.SHA1(newPassword).toString()
+        }, {
+            headers: {
+                Authorization: `${this.token}`
+            }
+        }).then(async (res) => {
+            await this.getInfos();
+            return res.data.info;
+        }).catch((err) => {
+            console.error(err);
+        });
+
+        return !!api;
+    }
+
     public getAccounts() {
         let account;
         return account = this.infos.accounts;
@@ -116,7 +140,6 @@ class User {
             return account.id === id;
         });
     }
-
 
 
     public async getTransaction(id: number) {
@@ -142,16 +165,35 @@ class User {
         return transaction;
     }
 
+    public updateTransaction(updatedTransaction: Transaction): Transaction | undefined {
+        let accounts = this.getAccounts();
+        let foundTransaction: Transaction | undefined;
+
+        accounts.forEach(async (account: Account) => {
+            const found = account.transactions.find((transaction: Transaction) => {
+                return transaction.id === updatedTransaction.id;
+            });
+
+            if (found) {
+                foundTransaction = found;
+                console.log(foundTransaction);
+                this.save();
+            }
+        });
+
+        return foundTransaction;
+    }
+
 
     public getBudgets() {
         let budget: any = [];
         let accounts = this.getAccounts();
         accounts.forEach((account: Account) => {
-            account.transactions.forEach((transac:Transaction) => {
+            account.transactions.forEach((transac: Transaction) => {
                 budget.push(transac);
             });
         });
-        return budget.filter((transac:Transaction) => {
+        return budget.filter((transac: Transaction) => {
             return transac.type === 'expense';
         });
     }
@@ -186,19 +228,19 @@ class User {
     public getDepenses(idCategory: number, isCustom: boolean) {
         let depenses: any = [];
         let accounts = this.getAccounts();
-        accounts.forEach((account : Account) => {
-            account.transactions.filter((category : Category) => {
-                if(isCustom){
+        accounts.forEach((account: Account) => {
+            account.transactions.filter((category: Category) => {
+                if (isCustom) {
                     return category.customCategoryId === idCategory;
-                }else{
+                } else {
                     return category.categoryId === idCategory;
                 }
-            }).forEach((transac : Category) => {
+            }).forEach((transac: Category) => {
                 depenses.push(transac);
             });
         });
 
-        return depenses.filter((transac:Transaction) => {
+        return depenses.filter((transac: Transaction) => {
             return transac.type === 'expense';
         });
     }
@@ -215,7 +257,7 @@ class User {
                 return cat.id === id;
             });
         }
-        if(!category){
+        if (!category) {
             return;
         }
         category.maxAmount = newMax
@@ -239,8 +281,6 @@ class User {
 
         return !!api;
     }
-
-
 
 
 }
