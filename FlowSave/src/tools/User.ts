@@ -17,6 +17,7 @@ type Category = {
     categoryId: number,
     customCategoryId: number,
     type: string,
+    color: string,
 }
 type Account = {
     id: number,
@@ -43,6 +44,7 @@ type Transaction = {
     account: Account,
     category: Category,
     customCategory: Category,
+
 }
 type userInfos = {
     id: number,

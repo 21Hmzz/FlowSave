@@ -96,10 +96,9 @@ type ThrottleFunction = (...args: any[]) => void;
 
 
 function useThrottle(func: ThrottleFunction, delay: number): ThrottleFunction {
-  //@ts-ignore
-  let timeoutId;
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
-  const throttledFunc = function (...args: any[]) {
+  const throttledFunc: ThrottleFunction = function (this: any, ...args: any[]) {
     const context = this;
 
     if (!timeoutId) {

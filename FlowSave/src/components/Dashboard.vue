@@ -16,7 +16,13 @@ interface Account {
   transactions: Transaction[];
   saves: Save[];
 }
-
+interface  Info {
+  id: number;
+  name: string;
+  email: string;
+  save: number;
+  accounts: Account[];
+}
 interface Transaction {
   id: number;
   name: string;
@@ -37,7 +43,13 @@ moment.locale('fr');
 const token = localStorage.getItem('token') || '';
 const $toast = useToast();
 const router = useRouter();
-const infos = ref([]);
+const infos = ref<Info>({
+  id: 0,
+  name: '',
+  email: '',
+  save: 0,
+  accounts: []
+});
 const DateHour = moment().fromNow();
 const data = ref([]);
 const accounts = ref<Account[]>([]);

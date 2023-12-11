@@ -6,19 +6,21 @@ import Axios from "@/tools/Axios";
 import moment from "moment";
 import {useToast} from "vue-toast-notification";
 import router from "@/router";
-import {Modal, ModalInterface} from "flowbite";
+import {Modal} from "flowbite";
+import type { ModalInterface } from "flowbite";
+
 
 const $toast = useToast();
-const infos = ref([]);
-const data = ref([]);
-const account = ref({});
-const page = ref(1);
-const search = ref('');
-const allCategories = ref([]);
-const defaultCategory = ref([]);
-const customCategory = ref([]);
-const selectedCategory = ref('');
-const selectedCustomCategory = ref('');
+const infos = ref<any>({});
+const data = ref<any[]>([]);
+const account = ref<any>({});
+const page = ref<number>(1);
+const search = ref<any>('');
+const allCategories = ref<any[]>([]);
+const defaultCategory = ref<any[]>([]);
+const customCategory = ref<any[]>([]);
+const selectedCategory = ref<any>('');
+const selectedCustomCategory = ref<any>('');
 
 
 const newTransaction = ref({
@@ -27,12 +29,15 @@ const newTransaction = ref({
   date: '',
   type: '',
   account: '',
-  comment: ''
-});
-const selectedTransaction = ref({});
+  comment: '',
+  categoryId: '',
+  customCategoryId: '',
 
-const countTransactions = ref(0);
-const totalPage = ref(0);
+});
+const selectedTransaction = ref<any>({});
+
+const countTransactions = ref<number>(0);
+const totalPage = ref<number>(0);
 const getAllInfosDashboard = async (token: string) => {
   if (token) {
     try {
@@ -52,7 +57,7 @@ const getAllInfosDashboard = async (token: string) => {
     return null;
   }
 };
-const transactions = ref([]);
+const transactions = ref<any[]>([]);
 const selectedAccount = ref(localStorage.getItem('selectedAccountType') || 'personnel');
 
 onMounted(async () => {
@@ -124,13 +129,13 @@ function searchTransaction() {
 
 function addTransaction(accountId: number) {
   if (newTransaction.value.name && newTransaction.value.amount && newTransaction.value.date && newTransaction.value.type) {
-    if (newTransaction.value.amount == 0) {
+    if (parseInt(newTransaction.value.amount) == 0) {
       $toast.error('Le montant ne peut pas être égal à 0');
       return;
-    } else if (newTransaction.value.amount < 0) {
+    } else if (parseInt(newTransaction.value.amount)< 0) {
       $toast.error('Le montant ne peut pas être inférieur à 0');
       return;
-    } else if (isNaN(newTransaction.value.amount)) {
+    } else if (isNaN(parseInt(newTransaction.value.amount))) {
       $toast.error('Le montant doit être un nombre');
       return;
     }
@@ -152,8 +157,9 @@ function addTransaction(accountId: number) {
       }).then((response) => {
         if (response.data) {
           $toast.success('La transaction a bien été ajoutée');
-          const tmpData = getAllInfosDashboard(token);
-          if (tmpData && tmpData.accounts) {
+          const tmpData = getAllInfosDashboard(token) || {};
+          if (tmpData ) {
+            // @ts-ignore
             data.value = tmpData.accounts;
             let accounts = data.value.find((account: any) => account.type === selectedAccount.value) || {}
             transactions.value = accounts.transactions;
@@ -203,7 +209,8 @@ function updateTransaction() {
         if (response.data) {
           $toast.success('La transaction a bien été modifiée');
           const tmpData = getAllInfosDashboard(token);
-          if (tmpData && tmpData.accounts) {
+          if (tmpData ) {
+            // @ts-ignore
             data.value = tmpData.accounts;
             let accounts = data.value.find((account: any) => account.type === selectedAccount.value) || {}
             transactions.value = accounts.transactions;
@@ -236,7 +243,8 @@ function deleteTransaction(id: string) {
       if (response.data) {
         $toast.success('La transaction a bien été supprimée');
         const tmpData = getAllInfosDashboard(token);
-        if (tmpData && tmpData.accounts) {
+        if (tmpData) {
+          // @ts-ignore
           data.value = tmpData.accounts;
           let accounts = data.value.find((account: any) => account.type === selectedAccount.value) || {}
           transactions.value = accounts.transactions;
@@ -328,7 +336,8 @@ function exportTransactions() {
 }
 
 function selectAll() {
-  if (document.getElementById('checkbox-all').checked) {
+  let checkbox = document.getElementById('checkbox-all') as HTMLInputElement;
+  if (checkbox.checked) {
     checkAll();
   } else {
     uncheckAll();
@@ -337,22 +346,22 @@ function selectAll() {
 }
 
 function checkAll() {
-  let checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  let checkboxes = document.querySelectorAll('input[type="checkbox"]') as NodeListOf<HTMLInputElement>;
   checkboxes.forEach((checkbox) => {
     checkbox.checked = true;
   });
 }
 
 function uncheckAll() {
-  let checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  let checkboxes = document.querySelectorAll('input[type="checkbox"]') as NodeListOf<HTMLInputElement>;
   checkboxes.forEach((checkbox) => {
     checkbox.checked = false;
   });
 }
 
 function deleteSelection() {
-  let checkboxes = document.querySelectorAll('input[type="checkbox"]');
-  let ids = [];
+  let checkboxes = document.querySelectorAll('input[type="checkbox"]') as NodeListOf<HTMLInputElement>;
+  let ids = [] as string[];
   checkboxes.forEach((checkbox) => {
     if (checkbox.checked) {
       ids.push(checkbox.id.split('-')[1]);
@@ -635,14 +644,14 @@ function limitToOneCategory() {
                         <div v-if="transaction.category && transaction.category.name"
                              :style="{backgroundColor: transaction.category.color,color: isLightColor(transaction.category.color) ? 'black' : 'white'}"
                              class="bg-blue-100 text-blue-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded  flex items-center justify-center cursor-pointer"
-                             @click="router.push({name: 'budget-id', params: {id: transaction.category.id,isCustom : false}})"
+                             @click="router.push({name: 'budget-id', params: {id: transaction.category.id,isCustom : 'false'}})"
                           >
                           {{ transaction.category.name }}
                         </div>
                         <div v-else-if="transaction.customCategory && transaction.customCategory.name"
                              :style="{backgroundColor: transaction.customCategory.color,color: isLightColor(transaction.customCategory.color) ? 'black' : 'white'}"
                              class="text-sm font-medium me-2 px-2.5 py-1 rounded flex items-center justify-center cursor-pointer"
-                             @click="router.push({name: 'budget-id', params: {id: transaction.customCategory.id,isCustom : true}})">
+                             @click="router.push({name: 'budget-id', params: {id: transaction.customCategory.id,isCustom : 'true'}})">
                           {{ transaction.customCategory.name }}
                         </div>
 
@@ -810,7 +819,7 @@ function limitToOneCategory() {
                                       <select name="category" id="category"
                                               class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full py-2.5 pl-3 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                               required v-model="selectedTransaction.categoryId"
-                                              @change="limitToOneCategory(selectedTransaction)">
+                                              @change="limitToOneCategory()">
                                         <option :selected="selectedTransaction.categoryId === ''" value="">
                                           Choix de la catégorie
                                         </option>
@@ -827,7 +836,7 @@ function limitToOneCategory() {
                                       <select name="customCategory" id="customCategory"
                                               class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full py-2.5 pl-3 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                               required v-model="selectedTransaction.customCategoryId"
-                                              @change="limitToOneCategory(selectedTransaction)">
+                                              @change="limitToOneCategory()">
                                         <option :selected="selectedTransaction.customCategoryId === ''" value="">
                                           Choix de la catégorie
                                         </option>
@@ -990,7 +999,7 @@ function limitToOneCategory() {
                         <select name="category" id="category"
                                 class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full py-2.5 pl-3 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                 required v-model="newTransaction.categoryId"
-                                @change="limitToOneCategory(newTransaction)">
+                                @change="limitToOneCategory()">
                           <option :selected="newTransaction.categoryId === ''" value="">
                             Choix de la catégorie
                           </option>
@@ -1006,7 +1015,7 @@ function limitToOneCategory() {
                         <select name="customCategory" id="customCategory"
                                 class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full py-2.5 pl-3 pr-10 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                                 required v-model="newTransaction.customCategoryId"
-                                @change="limitToOneCategory(newTransaction)">
+                                @change="limitToOneCategory()">
                           <option :selected="newTransaction.customCategoryId === ''" value="">
                             Choix de la catégorie
                           </option>

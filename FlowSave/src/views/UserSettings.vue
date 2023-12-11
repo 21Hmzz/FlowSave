@@ -32,7 +32,7 @@ const  changePassword = () => {
       duration: 5000,
       position: "top-right",
     });
-  }).catch((err) => {
+  }).catch((err:any) => {
     $toast.open({
       message: err,
       type: "error",
